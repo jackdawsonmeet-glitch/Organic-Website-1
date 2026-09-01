@@ -1,0 +1,7 @@
+# Netlify automatically applies its current OpenNext adapter for this Next.js site.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
