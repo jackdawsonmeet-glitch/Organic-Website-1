@@ -16,11 +16,9 @@ export const DOCTOR_WEBSITE_URL="https://your-new-website.com/";
 
 That single setting controls:
 
-- all six transparent homepage referral areas;
-- every **Find a Doctor** link;
-- the automatic 30-second redirect.
+- every **Find a Doctor** link through the `/find-a-doctor` redirect.
 
-To change the delay, edit `DOCTOR_REDIRECT_DELAY_MS` in the same file. `30_000` means 30 seconds; `60_000` means 60 seconds.
+Referrals require an intentional click. There are no invisible referral areas, timed page takeovers, or fullscreen requests. Advertising uses its own setting below.
 
 ## Change the advertisement link later
 
@@ -39,7 +37,7 @@ The animated GIF is stored at `public/ads/casino-jackpot-storyboard.gif`. Replac
 ## Test in VS Code
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -72,3 +70,31 @@ Open <http://localhost:3000>.
 3. Push the branch and open a GitHub pull request.
 4. Netlify creates a separate Deploy Preview URL for that pull request.
 5. Check the preview. Merge the pull request into `main` to update the production website.
+
+
+## SEO configuration
+
+Set `SITE_URL` to the preferred public origin (for example, your verified custom domain) in the hosting build environment. Use only the origin, with no path, query, or fragment. On Netlify, its built-in `URL` is the fallback and already represents the main site address. Do not use `DEPLOY_URL`, `DEPLOY_PRIME_URL`, or the doctor referral destination as the canonical origin.
+
+Without either `SITE_URL` or Netlify's `URL`, local builds omit canonical URLs and WebSite markup and produce an empty sitemap. This allows local work without inventing a production domain. Configure the real address before deploying outside Netlify. Rebuild after changing these values.
+
+- Public pages have distinct titles, descriptions, self-canonical URLs, and Open Graph/X text metadata.
+- `/robots.txt` links to `/sitemap.xml`; the sitemap contains existing public content routes and preserves the current condition slugs.
+- Unknown condition slugs return 404. All 27 known condition routes are generated at build time.
+- Netlify preview and branch deploy pages use `noindex, follow`, with no sitemap entries. They remain crawlable so crawlers can read `noindex`.
+- `/subscribe` is `noindex, follow` while its backend is unfinished. `/find-a-doctor` and API routes are excluded from the sitemap.
+- Set `GOOGLE_SITE_VERIFICATION` to the HTML verification token supplied by Google Search Console when that property is ready. Then submit the production `/sitemap.xml` in Search Console.
+- Health photos use Next.js responsive image delivery; the hero is preloaded, and the remaining images load lazily with reserved dimensions.
+
+No invented author names, medical reviewers, ratings, publication dates, or article structured data have been added. Generic condition content and missing full articles remain editorial work; see [SEO roadmap](docs/seo-roadmap.md).
+
+### Verify the SEO output locally
+
+Build using a reserved test origin, then run the production HTTP checks:
+
+```bash
+SITE_URL=https://seo-validation.example npm run build
+SITE_URL=https://seo-validation.example node scripts/check-seo.mjs
+```
+
+The test origin is for local validation only. Never configure it in your hosting environment. The check starts a temporary production server and verifies metadata, sitemap routes, preview indexing behavior in the built output, unknown-route 404s, and image delivery. No browser or live ranking measurement is involved.

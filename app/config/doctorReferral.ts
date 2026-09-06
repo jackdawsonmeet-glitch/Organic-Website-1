@@ -8,9 +8,3 @@
  * export const DOCTOR_WEBSITE_URL="https://your-new-website.com/";
  */
 export const DOCTOR_WEBSITE_URL="https://myvetahealth.netlify.app/";
-
-/**
- * Automatic redirect delay in milliseconds.
- * 30_000 = 30 seconds. For example, use 60_000 for 60 seconds.
- */
-export const DOCTOR_REDIRECT_DELAY_MS=30_000;
