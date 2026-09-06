@@ -16,9 +16,13 @@ export const DOCTOR_WEBSITE_URL="https://your-new-website.com/";
 
 That single setting controls:
 
-- every **Find a Doctor** link through the `/find-a-doctor` redirect.
+- all six original transparent homepage referral areas;
+- every **Find a Doctor** link;
+- the automatic redirect after **10 seconds**.
 
-Referrals require an intentional click. There are no invisible referral areas, timed page takeovers, or fullscreen requests. Advertising uses its own setting below.
+The original click handler, fullscreen behavior, and embedded destination are retained. Keep these features unchanged during SEO work, as requested by the site owner. The destination remains controlled by this setting; advertisements use their separate setting below.
+
+`DOCTOR_REDIRECT_DELAY_MS=10_000` sets the requested 10-second delay.
 
 ## Change the advertisement link later
 

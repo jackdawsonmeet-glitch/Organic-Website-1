@@ -1,6 +1,6 @@
 # MyVeta Health SEO roadmap
 
-Source baseline: `7085281766a48f5e8c70bc288022be3cad490be3` in Organic-Website-1, reviewed September 6, 2026. This is a source audit; the production domain, Google indexing, Search Console data, rankings, and real-user performance have not been verified. The configured doctor/ad destination is not evidence of this site's production domain.
+Source baseline: `7085281766a48f5e8c70bc288022be3cad490be3` in Organic-Website-1, reviewed September 6, 2026. This is a source audit; the production domain, Google indexing, Search Console data, rankings, and real-user performance have not been verified. The owner subsequently supplied `https://myvetahealth.netlify.app/` as the live website URL. Live indexing and performance remain unverified.
 
 ## First implementation
 
@@ -8,13 +8,17 @@ Source baseline: `7085281766a48f5e8c70bc288022be3cad490be3` in Organic-Website-1
 - Add a production sitemap and robots file, with a configurable canonical origin and optional Search Console verification token.
 - Limit condition routes to the 27 existing topics, preserve existing slugs, and return 404 for unknown topics.
 - Generate known condition pages at build time; fix the A–Z anchors and navigation to real topics.
-- Remove the timed iframe takeover, fullscreen click handler, and invisible referral areas. Keep visible ads and intentional doctor referrals. Mark the ad link as sponsored.
+- Preserve the original timed iframe, fullscreen click handler, and all six homepage referral areas. The owner explicitly requested a 10-second delay and unchanged click behavior/destination. Keep those behaviors intact during future SEO work; the ad link retains its sponsored attribute.
 - Remove stale account/admin links and requests to missing endpoints from the public shell.
 - Replace unsubstantiated medical-review labels with educational wording. Do not invent reviewers, credentials, or dates.
 - Deliver health photographs through Next.js responsive images, preload the hero, and reserve image dimensions.
 - Mark the unfinished newsletter signup and Netlify preview builds `noindex, follow`. Existing condition pages remain indexable; assess them with real search data before changing that policy.
 
 This is a technical foundation. It does not demonstrate improved rankings or resolve the editorial gaps below.
+
+## Required behavior
+
+SEO improvements must preserve the timed redirect, existing click targets, fullscreen behavior, and configured referral destination. The requested delay is 10 seconds. Do not remove or disable these features as an SEO optimization.
 
 ## Priorities after review
 
@@ -50,6 +54,9 @@ After deployment, submit the canonical sitemap and inspect representative URLs i
 
 ## Validation of this implementation
 
-Production and Netlify preview builds passed Next.js compilation and TypeScript checking. The HTTP check covered all 36 content pages: distinct titles/descriptions, canonical paths, Open Graph/X text, one H1, indexing rules, a 35-URL production sitemap, an empty preview sitemap, actual 404 responses, existing encoded condition URLs, and the intentional doctor redirect. The homepage WebSite markup was checked against the configured origin.
+Production and Netlify preview builds passed Next.js compilation and TypeScript checking. The HTTP check covered all 36 content pages: distinct titles/descriptions, canonical paths, Open Graph/X text, one H1, indexing rules, a 35-URL production sitemap, an empty preview sitemap, actual 404 responses, existing encoded condition URLs, the doctor redirect, mounted redirect component, and all six original referral areas. The homepage WebSite markup was checked against the configured origin.
 
 In a local image check, a 640-pixel WebP hero response was 42,962 bytes versus its 2,610,321-byte PNG source. This is one image response, not a production page-speed measurement or a Core Web Vitals score. Browser/visual testing and live SEO verification were not performed.
+
+
+After the owner's correction, the original redirect component and all six referral areas were restored, with a 10-second delay. The revised code passed compilation, TypeScript, and the 36-page HTTP checks without a configured origin. A separate code-level check exercised the timer, doctor/ad clicks, fullscreen requests, ordinary link handling, and cleanup using simulated browser objects; no live-browser test was performed.
