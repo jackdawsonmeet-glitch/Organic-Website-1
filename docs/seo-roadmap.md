@@ -24,13 +24,13 @@ SEO improvements must preserve the timed redirect, existing click targets, fulls
 
 | Priority | Finding | Next action | Evidence of completion |
 | --- | --- | --- | --- |
-| 1 | The actual public origin and search baseline are unknown. | Confirm the domain, intended audience, and main conversion. Verify its Search Console property; inspect indexing, queries, and pages. | Correct canonical URLs; baseline clicks, impressions, CTR, position, and indexed-page counts. |
+| 1 | The owner confirmed `https://myvetahealth.netlify.app/`; the search baseline is unknown. | Verify its Search Console property; inspect indexing, queries, and pages. Confirm the main conversion. | Correct canonical URLs; baseline clicks, impressions, CTR, position, and indexed-page counts. |
 | 1 | All 27 condition pages share the same generic body. | Prioritize a few relevant conditions and create distinct, useful guides with authoritative sources and a real qualified review process. Avoid mass expansion. | Each guide answers the topic's questions and displays verifiable authorship, reviewer details when reviewed, references, and genuine dates. |
-| 1 | Article cards and daily summaries have no full articles. | Publish complete articles with stable URLs and link each card to its own article. Use article markup only when supported by visible content. | Every article link reaches a matching complete article; no claim to read a full article that does not exist. |
-| 1 | Drug search and tool links are placeholders; newsletter signup is not connected. | Complete these services or replace promises and dead controls with accurate descriptions of what is available. | Users can complete the advertised task; no false success messages. |
+| 1 | Seven full guides now replace article-card placeholders. They have not been independently medically reviewed. | Have a qualified professional review the guides, improve them based on real reader needs, and record actual review details. | Matching stable links, clear source citations, and verifiable review details when completed. |
+| 1 | Medication resources now link to real MyVeta, FDA, and NLM destinations. Newsletter signup is still not connected. | Implement the subscription backend or correct its promises and success behavior in a separate functional change. | Subscribers are actually saved and receive the promised service. |
 | 1 | About/footer policy and privacy statements are not fully supported by implemented features. | Confirm the operator, contact details, real editorial/review process, data flows, and relevant policies. | Public trust and privacy information accurately describes the website. |
 | 2 | Main images were multi-megabyte files delivered directly. | Verify responsive image behavior on the actual host and measure mobile performance. Check the animated advertisement separately. | Production PageSpeed/Lighthouse measurements and available real-user Core Web Vitals; record before/after data. |
-| 2 | Wellbeing topics link to `#`; some navigation labels promise absent content. | Build useful topic sections/pages or simplify labels to match the destination. | Working links with descriptive anchor text and useful destinations. |
+| 2 | Wellbeing links now reach relevant guides or identified MedlinePlus resources. Some broader navigation and video labels still need editorial review. | Verify remaining labels against their actual destinations. | Working links with descriptive anchor text and useful destinations. |
 | 2 | Several branded social links lead to platform homepages. | Connect verified official profiles or remove the misleading links. | Each branded profile link belongs to the actual publisher. |
 | 3 | No validated keyword or competitor research exists. | Use Search Console queries plus the confirmed audience to select topics, improve existing pages, and earn relevant editorial links. | Growth in relevant search visits and the chosen conversion, without purchased link schemes or ranking guarantees. |
 
@@ -52,7 +52,7 @@ After deployment, submit the canonical sitemap and inspect representative URLs i
 - [Netlify: Build environment variables](https://docs.netlify.com/build/configure-builds/environment-variables/)
 
 
-## Validation of this implementation
+## Validation of the initial foundation
 
 Production and Netlify preview builds passed Next.js compilation and TypeScript checking. The HTTP check covered all 36 content pages: distinct titles/descriptions, canonical paths, Open Graph/X text, one H1, indexing rules, a 35-URL production sitemap, an empty preview sitemap, actual 404 responses, existing encoded condition URLs, the doctor redirect, mounted redirect component, and all six original referral areas. The homepage WebSite markup was checked against the configured origin.
 
@@ -60,3 +60,20 @@ In a local image check, a 640-pixel WebP hero response was 42,962 bytes versus i
 
 
 After the owner's correction, the original redirect component and all six referral areas were restored, with a 10-second delay. The revised code passed compilation, TypeScript, and the 36-page HTTP checks without a configured origin. A separate code-level check exercised the timer, doctor/ad clicks, fullscreen requests, ordinary link handling, and cleanup using simulated browser objects; no live-browser test was performed.
+
+
+## Content and discovery implementation
+
+Built on owner commit `b666d7b22fed2a2538f2a73b4e179c5f4702da60` after the redirect restoration was merged.
+
+- Added seven complete educational guides for the seven existing article cards. A single server-side registry supplies the body, listing cards, metadata, sources, related links, and sitemap paths.
+- Added crawlable article links on the homepage and health hub, related-guide links, and visible breadcrumbs with matching structured data. Unknown guide slugs return 404.
+- Added Article markup only to the new full guides, using the visible MyVeta organization attribution and sources. No medical reviewer, rating, publication date, or review date is fabricated. AI assistance and the lack of independent medical review are disclosed.
+- Replaced wellbeing `#` links and medication resource placeholders with real destinations. The inactive medication search now points to the MedlinePlus medicine library.
+- Preserved the entire timed redirect component, both destination configuration files, symptom-checker page and API, global styles, homepage referral/hero block, and root layout. This includes the owner's latest consultation wording, all six referral areas, the 10-second delay, and the fullscreen click handler.
+
+This work does not establish a 100/100 live SEO score or promise Google rankings. The live site could not be retrieved through the available web checks. A deployed Lighthouse/PageSpeed audit and Search Console inspection are still needed; the local HTTP checks cover generated output and routing.
+
+Implementation references: [Google Article structured data](https://developers.google.com/search/docs/appearance/structured-data/article) and [Google BreadcrumbList structured data](https://developers.google.com/search/docs/appearance/structured-data/breadcrumb). Medical source links are provided beside the relevant sections in each guide.
+
+Validation of the content changes: production and Netlify preview builds passed compilation and TypeScript checks. The HTTP suite passed for all 43 content pages, with 42 sitemap URLs in production and zero in preview. It also checked all internal links and anchors, seven discoverable full guides, matching visible/schema breadcrumbs and article data, unknown-guide 404s, and the retained referral targets. ESLint passed for the new components, article routes/data, sitemap, and updated check script. A source comparison confirmed the six protected files, root layout, and homepage referral/hero block are byte-for-byte unchanged from the owner baseline.
