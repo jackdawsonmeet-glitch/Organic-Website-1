@@ -25,7 +25,7 @@ export default function EditorialHub() {
     <section className="video-section"><div className="container">
       <div className="section-head"><div><p className="eyebrow">WATCH AND LEARN</p><h2>Health organization video channels</h2><p>Explore video channels from health organizations.</p></div></div>
       <div className="video-grid">{dailyVideos.map(video => <article className="video-card" key={video.title}>
-        <a href={video.videoUrl} target="_blank" rel="noreferrer" className="video-poster" aria-label={`Visit the ${video.source} video channel`}>
+        <a href={video.videoUrl} target="_blank" rel="noreferrer" className="video-poster" aria-label={`Visit channel: ${video.source}`}>
           <Image width={1536} height={1024} sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 400px" src={video.image} alt="" /><span className="watch-label">Visit channel</span>
         </a>
         <div className="video-copy"><p className="tag">{video.section} · {video.source}</p><h3>{video.title}</h3><details><summary>View video summary</summary><p>{video.summary}</p></details></div>

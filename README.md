@@ -36,7 +36,11 @@ Change only the **AD LINK** line:
 export const AD_LINK_URL="https://your-new-ad-link.com/";
 ```
 
-The animated GIF is stored at `public/ads/casino-jackpot-storyboard.gif`. Replace that file with another GIF using the same filename to change the advertisement without editing the page code.
+The banner plays `public/ads/casino-jackpot-storyboard.mp4` as a muted, inline loop. A first-frame poster appears while it loads. If playback fails or autoplay is blocked, it uses the original GIF. The surrounding advertisement link and fullscreen/referral handler are unchanged.
+
+`AD_MEDIA_URL`, `AD_POSTER_URL`, and `AD_FALLBACK_MEDIA_URL` in the same configuration file select these assets. To replace the creative, update all three together so the video, poster, and fallback show the same advertisement. `AD_MEDIA_URL` can also point to an image/GIF to render it directly.
+
+The optimized video is 163,280 bytes; including its 35,734-byte poster, the normal download is about 87% smaller than the original 1,521,631-byte GIF. Its 45 frame timestamps and three-second loop duration are preserved. Video compression is lossy. These are asset measurements, not a new live PageSpeed score.
 
 ## Test in VS Code
 
@@ -88,7 +92,7 @@ Without either `SITE_URL` or Netlify's `URL`, local builds omit canonical URLs a
 - Netlify preview and branch deploy pages use `noindex, follow`, with no sitemap entries. They remain crawlable so crawlers can read `noindex`.
 - `/subscribe` is `noindex, follow` while its backend is unfinished. `/find-a-doctor` and API routes are excluded from the sitemap.
 - Set `GOOGLE_SITE_VERIFICATION` to the HTML verification token supplied by Google Search Console when that property is ready. Then submit the production `/sitemap.xml` in Search Console.
-- Health photos use Next.js responsive image delivery; the hero is preloaded, and the remaining images load lazily with reserved dimensions.
+- Health photos use Next.js responsive image delivery; the hero loads eagerly with high fetch priority, and the remaining images load lazily with reserved dimensions.
 
 Seven full health guides are maintained in `app/content/health-articles.ts` and generated at `/health-news/[slug]`. Their homepage and health-section cards use that same registry. Each guide includes original educational text, linked primary sources, related reading, its own metadata, and Article markup that matches the visible content. No publication dates, medical reviewers, ratings, or individual author credentials have been invented.
 
