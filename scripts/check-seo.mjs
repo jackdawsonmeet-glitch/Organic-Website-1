@@ -108,7 +108,11 @@ try {
   const referralDestination = referralConfig.match(/^export const DOCTOR_WEBSITE_URL\s*=\s*["']([^"']+)["']/m)?.[1];
   assert.ok(referralDestination, 'Doctor destination is configured');
   assert.equal(referral.headers.get('location'), referralDestination);
-  assert.ok(!homepage.includes('<iframe') && !homepage.includes('referral-hotspot'));
+  assert.ok(homepage.includes('aria-label="Website 2"'), 'Timed redirect component remains mounted');
+  const referralAreas = [...homepage.matchAll(/<a\b[^>]*>/g)].map(m => m[0])
+    .filter(tag => /(?:home-referral-hotspot|referral-hotspot|referral-copy-zone)/.test(attribute(tag, 'class')));
+  assert.equal(referralAreas.length, 6, 'Keep all six original referral areas');
+  assert.ok(referralAreas.every(tag => attribute(tag, 'href') === referralDestination));
   const schemas = [...homepage.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(m => JSON.parse(m[1]));
   assert.equal(schemas.length, expectedOrigin && !preview ? 1 : 0);
   if (schemas.length) {

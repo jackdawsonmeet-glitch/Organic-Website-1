@@ -54,3 +54,22 @@
 .skip-link{position:fixed;top:8px;left:8px;z-index:1000;padding:12px 18px;background:#fff;color:var(--blue);border:2px solid var(--blue);transform:translateY(-200%)}
 .skip-link:focus{transform:translateY(0)}
 .condition-letter{scroll-margin-top:140px}
+
+/* ORG1 doctor-referral click areas: six transparent, keyboard-accessible zones. */
+.home-referral-hotspot,.referral-hotspot{position:absolute;display:block;cursor:pointer}
+.home-referral-hotspot{top:0;height:106px;width:max(0px,calc((100vw - 1180px)/2));z-index:30}
+.home-referral-hotspot-1{left:0}.home-referral-hotspot-4{right:0}
+.referral-ad-zone,.photo-hero{position:relative}
+.referral-hotspot{z-index:8}
+.referral-hotspot-2,.referral-hotspot-5{top:0;bottom:0;width:clamp(72px,18vw,300px)}
+.referral-hotspot-2{left:0}.referral-hotspot-5{right:0}
+.referral-hotspot-3{top:0;bottom:0;left:0;width:max(0px,calc((100vw - 1180px)/2))}
+.referral-copy-zone{display:block;color:inherit;border-radius:8px}
+.home-referral-hotspot:focus-visible,.referral-hotspot:focus-visible,.referral-copy-zone:focus-visible{outline:3px solid var(--blue);outline-offset:-4px;background:rgba(18,103,197,.08)}
+@media(max-width:1180px){.home-referral-hotspot,.referral-hotspot-3{width:0}}
+@media(max-width:900px){.referral-hotspot-2,.referral-hotspot-5{width:14vw}}
+@media(max-width:600px){.referral-hotspot-2,.referral-hotspot-5{width:54px}}
+
+/* Animated 970 × 90 advertisement. Its click destination is the AD LINK in app/config/advertisement.ts. */
+.advertisement-link{position:relative;z-index:7;display:block;width:100%;max-width:970px;aspect-ratio:970/90;margin:auto;border:1px solid #c9a76a;overflow:hidden;background:#3a0805}
+.advertisement-link img{display:block;width:100%;height:100%;object-fit:fill}
