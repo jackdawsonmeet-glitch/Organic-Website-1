@@ -34,7 +34,7 @@ function decode(value) {
   return value.replaceAll('&amp;', '&').replaceAll('&quot;', '"').replaceAll('&#x27;', "'").replaceAll('&#39;', "'").replaceAll('&lt;', '<').replaceAll('&gt;', '>');
 }
 function attribute(tag, name) {
-  return decode(tag.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1] || '');
+  return decode(tag.match(new RegExp(`\\b${name}="([^"]*)"`, 'i'))?.[1] || '');
 }
 function meta(html, key, field = 'name') {
   return [...html.matchAll(/<meta\b[^>]*>/g)].map(match => match[0])
@@ -189,7 +189,34 @@ try {
   const photoTags = [...homepage.matchAll(/<img\b[^>]*>/g)].map(m => m[0]).filter(tag => attribute(tag, 'src').startsWith('/_next/image'));
   assert.ok(photoTags.length >= 8, 'Homepage uses responsive image delivery');
   assert.ok(photoTags.every(tag => attribute(tag, 'srcSet') && attribute(tag, 'sizes')));
-  assert.ok(homepage.includes('imageSrcSet='), 'Hero image is preloaded');
+  const hero = photoTags.find(tag => attribute(tag, 'class').includes('hero-background'));
+  assert.ok(hero, 'Hero image is present in the initial HTML');
+  assert.equal(attribute(hero, 'loading'), 'eager', 'Hero loading is immediate');
+  assert.equal(attribute(hero, 'fetchpriority'), 'high', 'Hero request has high priority');
+  const adConfig = await readFile('app/config/advertisement.ts', 'utf8');
+  const adSetting = name => adConfig.match(new RegExp(`^export const ${name}\\s*=\\s*["']([^"']+)["']`, 'm'))?.[1];
+  const adLink = homepage.match(/<a\b[^>]*class="advertisement-link"[^>]*>(.*?)<\/a>/)?.[0];
+  assert.ok(adLink, 'Advertisement remains a clickable link');
+  assert.equal(attribute(adLink, 'href'), adSetting('AD_LINK_URL'));
+  const video = adLink.match(/<video\b[^>]*>/)?.[0];
+  assert.ok(video, 'Advertisement uses the smaller video');
+  assert.equal(attribute(video, 'src'), adSetting('AD_MEDIA_URL'));
+  assert.equal(attribute(video, 'poster'), adSetting('AD_POSTER_URL'));
+  for (const name of ['autoplay', 'muted', 'loop', 'playsinline']) {
+    assert.ok(new RegExp(`\\b${name}(?:=|\\s|>)`, 'i').test(video), `Advertisement keeps ${name}`);
+  }
+  assert.ok(!/\bcontrols(?:=|\s|>)/i.test(video), 'Media controls do not intercept ad clicks');
+  const adVideo = await get(adSetting('AD_MEDIA_URL'));
+  assert.equal(adVideo.status, 200);
+  assert.ok(adVideo.headers.get('content-type')?.includes('video/mp4'));
+  const adVideoBytes = (await adVideo.arrayBuffer()).byteLength;
+  const poster = await get(adSetting('AD_POSTER_URL'));
+  assert.equal(poster.status, 200);
+  const posterBytes = (await poster.arrayBuffer()).byteLength;
+  const fallback = await get(adSetting('AD_FALLBACK_MEDIA_URL'));
+  assert.equal(fallback.status, 200, 'Original animation fallback is available');
+  const fallbackBytes = (await fallback.arrayBuffer()).byteLength;
+  assert.ok(adVideoBytes + posterBytes < fallbackBytes * 0.2, 'Video and poster save over 80% of the original ad download');
   const optimized = await fetch(origin + '/_next/image?url=%2Fimages%2Fsenior-wellness.png&w=640&q=75', { headers: { Accept: 'image/webp' } });
   assert.equal(optimized.status, 200);
   assert.ok(optimized.headers.get('content-type')?.includes('image/webp'));
@@ -199,6 +226,7 @@ try {
   console.log(`PASS: ${paths.length} content pages, ${urls.length} sitemap URLs, canonical and indexing checks (${preview ? 'preview' : expectedOrigin ? 'production' : 'no configured origin'}).`);
   console.log(`PASS: unknown URLs return 404; explicit referral works; responsive hero is ${optimizedBytes} bytes versus ${originalBytes} source bytes.`);
   console.log(`PASS: ${articlePaths.length} full guides, matching article/breadcrumb markup, discoverable article links, and valid internal anchors.`);
+  console.log(`PASS: hero has high loading priority; ad video and poster total ${adVideoBytes + posterBytes} bytes versus ${fallbackBytes} GIF bytes; click destination and loop attributes are retained.`);
 } finally {
   server.kill('SIGTERM');
   await new Promise(resolve => {
