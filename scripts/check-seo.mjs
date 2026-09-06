@@ -16,6 +16,9 @@ const paths = Object.keys(manifest.routes).filter(path =>
 const conditionPaths = paths.filter(path => path.startsWith('/conditions/'));
 assert.equal(conditionPaths.length, 27, 'Generate every known condition');
 assert.equal(manifest.dynamicRoutes['/conditions/[slug]'].fallback, false);
+const articlePaths = paths.filter(path => path.startsWith('/health-news/'));
+assert.equal(articlePaths.length, 7, 'Generate the seven complete health guides');
+assert.equal(manifest.dynamicRoutes['/health-news/[slug]'].fallback, false);
 
 const portReservation = createServer();
 await new Promise(resolve => portReservation.listen(0, '127.0.0.1', resolve));
@@ -38,6 +41,13 @@ function meta(html, key, field = 'name') {
     .filter(tag => attribute(tag, field) === key).map(tag => attribute(tag, 'content'));
 }
 function normalizedPath(path) { return decodeURIComponent(path); }
+function jsonLd(html) {
+  return [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(match => JSON.parse(match[1]));
+}
+function links(html) {
+  return [...html.matchAll(/<a\b[^>]*>/g)].map(match => attribute(match[0], 'href'));
+}
+function plainText(html) { return decode(html.replace(/<[^>]*>/g, '')).trim(); }
 async function get(path) {
   return fetch(origin + path, { redirect: 'manual', signal: AbortSignal.timeout(10000) });
 }
@@ -53,11 +63,13 @@ try {
   assert.ok(ready, `Production server did not start: ${logs}`);
   const titles = new Set();
   const descriptions = new Set();
+  const pages = new Map();
   let homepage = '';
   for (const path of paths) {
     const response = await get(path);
     assert.equal(response.status, 200, path);
     const html = await response.text();
+    pages.set(normalizedPath(path), html);
     if (path === '/') homepage = html;
     const titleTags = [...html.matchAll(/<title>([\s\S]*?)<\/title>/g)];
     assert.equal(titleTags.length, 1, `${path}: one title`);
@@ -85,6 +97,60 @@ try {
     assert.equal(robots.includes('noindex'), preview || path === '/subscribe', `${path}: indexing policy`);
     assert.equal((html.match(/<h1\b/g) || []).length, 1, `${path}: one main heading`);
     assert.ok(!html.includes('/admin') && !html.includes('signin-with-chatgpt'), `${path}: no missing account links`);
+
+    const schemas = jsonLd(html);
+    const breadcrumbs = schemas.filter(schema => schema['@type'] === 'BreadcrumbList');
+    const breadcrumbNav = html.match(/<nav\b[^>]*aria-label="Breadcrumb"[^>]*>(.*?)<\/nav>/)?.[1];
+    assert.equal(breadcrumbs.length, breadcrumbNav && expectedOrigin && !preview ? 1 : 0, `${path}: breadcrumb markup policy`);
+    if (breadcrumbs.length) {
+      const items = breadcrumbs[0].itemListElement;
+      const visibleNames = [...breadcrumbNav.matchAll(/<li\b[^>]*>(.*?)<\/li>/g)].map(match => plainText(match[1]));
+      assert.deepEqual(items.map(item => item.name), visibleNames, `${path}: breadcrumbs match visible navigation`);
+      assert.deepEqual(items.map(item => item.position), items.map((_, index) => index + 1));
+      assert.ok(items.every(item => new URL(item.item).origin === expectedOrigin));
+      assert.equal(normalizedPath(new URL(items.at(-1).item).pathname), normalizedPath(path));
+    }
+
+    if (articlePaths.includes(path)) {
+      const body = html.match(/<article\b[^>]*>([\s\S]*?)<\/article>/)?.[1];
+      assert.ok(body && plainText(body).split(/\s+/).length > 250, `${path}: full readable guide`);
+      assert.ok(body.includes('AI-assisted educational guide; not independently medically reviewed.'));
+      assert.deepEqual(meta(html, 'og:type', 'property'), ['article']);
+      const articles = schemas.filter(schema => schema['@type'] === 'Article');
+      assert.equal(articles.length, expectedOrigin && !preview ? 1 : 0);
+      if (articles.length) {
+        const article = articles[0];
+        assert.equal(article.headline, plainText(html.match(/<h1\b[^>]*>(.*?)<\/h1>/)[1]));
+        assert.equal(article.description, description[0]);
+        assert.equal(article.url, expectedOrigin + path);
+        assert.equal(article.mainEntityOfPage['@id'], article.url);
+        assert.equal(article.author.name, 'MyVeta Health');
+        assert.equal(article.author['@type'], 'Organization');
+        assert.ok(links(html).includes('/about'), 'Visible publisher attribution');
+        assert.ok(article.citation.length >= 2 && article.citation.every(url => links(body).includes(url)), `${path}: sources appear in the guide`);
+        assert.ok(!article.datePublished && !article.dateModified && !article.reviewedBy, 'No unverified publication or medical review claims');
+      }
+    }
+  }
+
+  // Check real rendered links, including table-of-contents and cross-page anchors.
+  for (const [path, html] of pages) {
+    for (const href of links(html)) {
+      assert.ok(href && href !== '#', `${path}: no empty links`);
+      const destination = new URL(href, origin + path);
+      if (destination.origin !== origin || destination.pathname === '/find-a-doctor') continue;
+      const target = pages.get(normalizedPath(destination.pathname));
+      assert.ok(target, `${path}: internal link ${href} reaches a generated page`);
+      if (destination.hash) {
+        const ids = [...target.matchAll(/\bid="([^"]+)"/g)].map(match => decode(match[1]));
+        assert.ok(ids.includes(decodeURIComponent(destination.hash.slice(1))), `${path}: anchor ${href} exists`);
+      }
+    }
+  }
+  for (const articlePath of articlePaths) {
+    for (const hub of ['/', '/health-news']) {
+      assert.ok(links(pages.get(hub)).includes(articlePath), `${hub}: crawlable link to ${articlePath}`);
+    }
   }
 
   const robots = await (await get('/robots.txt')).text();
@@ -99,7 +165,7 @@ try {
   for (const path of ['/conditions/hiv-%26-aids', '/conditions/crohn%27s-disease']) {
     assert.equal((await get(path)).status, 200, `${path}: encoded legacy URL`);
   }
-  for (const path of ['/conditions/definitely-not-a-condition', '/this-page-does-not-exist']) {
+  for (const path of ['/conditions/definitely-not-a-condition', '/health-news/definitely-not-a-guide', '/this-page-does-not-exist']) {
     assert.equal((await get(path)).status, 404, `${path}: real 404`);
   }
   const referral = await get('/find-a-doctor');
@@ -132,6 +198,7 @@ try {
   assert.ok(optimizedBytes < originalBytes, 'Responsive image is smaller than its source');
   console.log(`PASS: ${paths.length} content pages, ${urls.length} sitemap URLs, canonical and indexing checks (${preview ? 'preview' : expectedOrigin ? 'production' : 'no configured origin'}).`);
   console.log(`PASS: unknown URLs return 404; explicit referral works; responsive hero is ${optimizedBytes} bytes versus ${originalBytes} source bytes.`);
+  console.log(`PASS: ${articlePaths.length} full guides, matching article/breadcrumb markup, discoverable article links, and valid internal anchors.`);
 } finally {
   server.kill('SIGTERM');
   await new Promise(resolve => {

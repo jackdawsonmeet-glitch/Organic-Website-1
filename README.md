@@ -90,7 +90,11 @@ Without either `SITE_URL` or Netlify's `URL`, local builds omit canonical URLs a
 - Set `GOOGLE_SITE_VERIFICATION` to the HTML verification token supplied by Google Search Console when that property is ready. Then submit the production `/sitemap.xml` in Search Console.
 - Health photos use Next.js responsive image delivery; the hero is preloaded, and the remaining images load lazily with reserved dimensions.
 
-No invented author names, medical reviewers, ratings, publication dates, or article structured data have been added. Generic condition content and missing full articles remain editorial work; see [SEO roadmap](docs/seo-roadmap.md).
+Seven full health guides are maintained in `app/content/health-articles.ts` and generated at `/health-news/[slug]`. Their homepage and health-section cards use that same registry. Each guide includes original educational text, linked primary sources, related reading, its own metadata, and Article markup that matches the visible content. No publication dates, medical reviewers, ratings, or individual author credentials have been invented.
+
+Breadcrumbs are visible and marked up on guide, condition, health-section, wellbeing, and medication pages. The production sitemap includes 42 content URLs. Wellbeing topics and medication resource cards link to matching MyVeta guides or clearly identified public health resources; the inert medication search has been replaced by a MedlinePlus library link.
+
+The new guides are AI-assisted and have not been independently medically reviewed; that status is visible on the guides and About page. Generic condition content, actual medical review, unfinished newsletter signup, and live search measurement remain work; see [SEO roadmap](docs/seo-roadmap.md).
 
 ### Verify the SEO output locally
 
@@ -101,4 +105,4 @@ SITE_URL=https://seo-validation.example npm run build
 SITE_URL=https://seo-validation.example node scripts/check-seo.mjs
 ```
 
-The test origin is for local validation only. Never configure it in your hosting environment. The check starts a temporary production server and verifies metadata, sitemap routes, preview indexing behavior in the built output, unknown-route 404s, and image delivery. No browser or live ranking measurement is involved.
+The test origin is for local validation only. Never configure it in your hosting environment. The check starts a temporary production server and verifies metadata, sitemap routes, preview indexing behavior in the built output, unknown-route 404s, image delivery, matching Article/BreadcrumbList markup, discoverable guides, and internal link/anchor destinations. No browser or live ranking measurement is involved.

@@ -1,0 +1,6 @@
+.article { min-width: 0; }
+.article section { scroll-margin-top: 130px; }
+.article a { color: var(--blue); text-decoration: underline; text-underline-offset: 3px; }
+.article .disclosure { padding: 18px 20px; margin-top: 0; background: #f3f7fa; border-left: 3px solid #87afc5; font-size: 14px; }
+.article .citations { margin-top: 18px; font-size: 13px; line-height: 1.7; }
+.photo { display: block; width: 100%; height: auto; border-radius: 8px; margin: 24px 0; }
