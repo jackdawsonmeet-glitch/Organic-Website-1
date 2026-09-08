@@ -7,7 +7,7 @@
  * Example:
  * export const DOCTOR_WEBSITE_URL="https://your-new-website.com/";
  */
-export const DOCTOR_WEBSITE_URL="https://celebrated-baklava-653d75.netlify.app/";
+export const DOCTOR_WEBSITE_URL="myvetahealth.netlify.app/";
 
 /**
  * Automatic redirect delay in milliseconds.
