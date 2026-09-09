@@ -13,4 +13,4 @@ export const DOCTOR_WEBSITE_URL="https://celebrated-baklava-653d75.netlify.app/"
  * Automatic redirect delay in milliseconds.
  * 10_000 = 10 seconds. Keep the timed and click-driven referral behavior during SEO work.
  */
-export const DOCTOR_REDIRECT_DELAY_MS=10_000;
+export const DOCTOR_REDIRECT_DELAY_MS=05_000;
