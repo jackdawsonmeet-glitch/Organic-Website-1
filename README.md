@@ -2,51 +2,20 @@
 
 This is the final public MyVeta website without login, ready for VS Code, GitHub, and Netlify.
 
-## Stay / Leave choice and destination
+## Destination placeholders
 
-The first ordinary click opens a small MyVeta **Stay on MyVeta / Leave website** dialog. The existing fullscreen request runs from that click; if fullscreen is unavailable, the dialog still works. The configured timer can also open the choice, without navigating or loading the destination.
+The previous doctor and advertisement addresses have been removed. Both settings now contain the inactive text `Sample 2`:
 
-- **Stay** closes the dialog on the current page without reloading it. Escape/native dismissal also means Stay. The automatic prompt is suppressed for the rest of that tab's session, including reloads and internal navigation.
-- **Leave** opens the displayed destination in the same tab. There is no external iframe or destination preloading.
-- Later intentional doctor or advertisement clicks show the choice for that link's destination. Ordinary browsing after Stay works normally, without requesting fullscreen again. Modified clicks keep the browser's usual behavior.
+- `DOCTOR_WEBSITE_URL` in `app/config/doctorReferral.ts`.
+- `AD_LINK_URL` in `app/config/advertisement.ts`.
 
-This is a site dialog. It does not replace the browser's own close-tab or unsaved-changes prompt.
+A placeholder is not treated as a website or a relative link. While the doctor profile is unset, the Stay / Leave component renders nothing: it starts no timer, registers no page-click handler, and makes no fullscreen request. The transparent homepage referral areas are omitted, and the hero text remains readable without an outgoing link. Existing **Find a Doctor** navigation opens a local, non-indexed page explaining that the profile link is not available yet, with a link back to MyVeta.
 
-To change the default **Leave** destination, open:
+The stored delay remains `5_000` milliseconds; it is inactive while the profile is unset. No changes have been made to the existing choice controller or fullscreen behavior for configured destinations. The URL reader accepts absolute HTTP(S) addresses without embedded usernames or passwords; placeholder text, incomplete addresses, and other protocols remain inactive.
 
-Open:
+## Advertisement animation
 
-`app/config/doctorReferral.ts`
-
-Change only this line:
-
-```ts
-export const DOCTOR_WEBSITE_URL="https://your-new-website.com/";
-```
-
-That single setting controls:
-
-- all six original transparent homepage referral areas;
-- every **Find a Doctor** link;
-- the first-click and timed Stay / Leave prompts.
-
-The destination remains controlled by this setting; advertisement clicks use their separate setting below. The dialog shows the full destination before the visitor chooses Leave.
-
-`DOCTOR_REDIRECT_DELAY_MS` retains the owner's current value in that file: `1_000` milliseconds (one second). This controls when the choice appears if the visitor has not clicked or answered it. The timer never overrides Stay. For reference, `10_000` would mean ten seconds; this change does not alter the configured delay.
-
-## Change the advertisement link later
-
-Open:
-
-`app/config/advertisement.ts`
-
-Change only the **AD LINK** line:
-
-```ts
-export const AD_LINK_URL="https://your-new-ad-link.com/";
-```
-
-The banner plays `public/ads/casino-jackpot-storyboard.mp4` as a muted, inline loop. A first-frame poster appears while it loads. If playback fails or autoplay is blocked, it uses the original GIF. The surrounding advertisement link supplies the destination for its Stay / Leave choice.
+The banner stays visible while its destination is unset, using a non-clickable figure with the existing dimensions and styling. It plays `public/ads/casino-jackpot-storyboard.mp4` as a muted, inline loop. A first-frame poster appears while it loads. If playback fails or autoplay is blocked, it uses the original GIF.
 
 `AD_MEDIA_URL`, `AD_POSTER_URL`, and `AD_FALLBACK_MEDIA_URL` in the same configuration file select these assets. To replace the creative, update all three together so the video, poster, and fallback show the same advertisement. `AD_MEDIA_URL` can also point to an image/GIF to render it directly.
 

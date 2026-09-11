@@ -1,10 +1,10 @@
 /**
  * AD LINK (the website opened when a visitor clicks the advertisement)
  *
- * To replace the ad destination later, change ONLY the URL between the
- * quotation marks below. Keep the full `https://` address.
+ * Sample 2 is an inactive placeholder. The animation remains visible,
+ * but the banner has no outgoing link while its destination is unset.
  */
-export const AD_LINK_URL="https://celebrated-baklava-653d75.netlify.app/";
+export const AD_LINK_URL="Sample 2";
 
 /** Animated advertisement file shown in the 970 × 90 banner area. */
 export const AD_MEDIA_URL="/ads/casino-jackpot-storyboard.mp4";

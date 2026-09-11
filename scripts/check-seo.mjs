@@ -169,19 +169,29 @@ try {
     assert.equal((await get(path)).status, 404, `${path}: real 404`);
   }
   const referral = await get('/find-a-doctor');
-  assert.equal(referral.status, 307, 'Intentional doctor referral still redirects');
   const referralConfig = await readFile('app/config/doctorReferral.ts', 'utf8');
-  const referralDestination = referralConfig.match(/^export const DOCTOR_WEBSITE_URL\s*=\s*["']([^"']+)["']/m)?.[1];
-  assert.ok(referralDestination, 'Doctor destination is configured');
-  assert.equal(referral.headers.get('location'), referralDestination);
+  const referralSetting = referralConfig.match(/^export const DOCTOR_WEBSITE_URL\s*=\s*["']([^"']+)["']/m)?.[1];
+  const referralDestination = /^https?:\/\//.test(referralSetting || '') ? new URL(referralSetting).href : undefined;
   const choice = homepage.match(/<dialog\b[^>]*>(.*?)<\/dialog>/)?.[0];
-  assert.ok(choice?.includes('aria-labelledby="website-choice-title"'), 'Named Stay/Leave dialog is mounted');
-  assert.ok(!/\bopen(?:=|\s|>)/.test(choice.match(/<dialog\b[^>]*>/)[0]), 'Choice is closed in the initial HTML');
-  assert.ok(choice.includes('Stay on MyVeta') && choice.includes('Leave website'));
+  if (referralDestination) {
+    assert.equal(referral.status, 307, 'A configured doctor profile remains an explicit referral');
+    assert.equal(referral.headers.get('location'), referralDestination);
+    assert.ok(choice?.includes('aria-labelledby="website-choice-title"'));
+    assert.ok(!/\bopen(?:=|\s|>)/.test(choice.match(/<dialog\b[^>]*>/)[0]));
+  } else {
+    assert.equal(referral.status, 200, 'An unset doctor profile serves a useful page');
+    assert.equal(referral.headers.get('location'), null, 'A placeholder never redirects');
+    const referralPage = await referral.text();
+    assert.ok(referralPage.includes('The doctor profile link is not available yet.'));
+    assert.ok(meta(referralPage, 'robots').join(',').includes('noindex'));
+    assert.ok(links(referralPage).includes('/'), 'The unavailable profile offers a return to the homepage');
+    assert.equal(choice, undefined, 'No Stay/Leave dialog is mounted for an unset profile');
+    assert.ok(!links(homepage).some(href => href.includes('Sample')), 'Placeholder text never becomes a relative link');
+  }
   assert.ok(!homepage.includes('<iframe'), 'No external website is embedded during page loading');
   const referralAreas = [...homepage.matchAll(/<a\b[^>]*>/g)].map(m => m[0])
     .filter(tag => /(?:home-referral-hotspot|referral-hotspot|referral-copy-zone)/.test(attribute(tag, 'class')));
-  assert.equal(referralAreas.length, 6, 'Keep all six original referral areas');
+  assert.equal(referralAreas.length, referralDestination ? 6 : 0, 'Referral areas are inactive without a destination');
   assert.ok(referralAreas.every(tag => attribute(tag, 'href') === referralDestination));
   const schemas = [...homepage.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(m => JSON.parse(m[1]));
   assert.equal(schemas.length, expectedOrigin && !preview ? 1 : 0);
@@ -200,9 +210,16 @@ try {
   const adConfig = await readFile('app/config/advertisement.ts', 'utf8');
   const adSetting = name => adConfig.match(new RegExp(`^export const ${name}\\s*=\\s*["']([^"']+)["']`, 'm'))?.[1];
   const adLink = homepage.match(/<a\b[^>]*class="advertisement-link"[^>]*>(.*?)<\/a>/)?.[0];
-  assert.ok(adLink, 'Advertisement remains a clickable link');
-  assert.equal(attribute(adLink, 'href'), adSetting('AD_LINK_URL'));
-  const video = adLink.match(/<video\b[^>]*>/)?.[0];
+  const adDestination = /^https?:\/\//.test(adSetting('AD_LINK_URL') || '') ? new URL(adSetting('AD_LINK_URL')).href : undefined;
+  const adFigure = homepage.match(/<figure\b[^>]*class="advertisement-link"[^>]*>(.*?)<\/figure>/)?.[0];
+  if (adDestination) {
+    assert.ok(adLink, 'A configured advertisement remains a clickable link');
+    assert.equal(attribute(adLink, 'href'), adDestination);
+  } else {
+    assert.equal(adLink, undefined, 'The placeholder advertisement has no outgoing link');
+    assert.ok(adFigure, 'The animation remains visible with an unset destination');
+  }
+  const video = (adLink || adFigure).match(/<video\b[^>]*>/)?.[0];
   assert.ok(video, 'Advertisement uses the smaller video');
   assert.equal(attribute(video, 'src'), adSetting('AD_MEDIA_URL'));
   assert.equal(attribute(video, 'poster'), adSetting('AD_POSTER_URL'));
@@ -228,9 +245,9 @@ try {
   const originalBytes = (await readFile('public/images/senior-wellness.png')).byteLength;
   assert.ok(optimizedBytes < originalBytes, 'Responsive image is smaller than its source');
   console.log(`PASS: ${paths.length} content pages, ${urls.length} sitemap URLs, canonical and indexing checks (${preview ? 'preview' : expectedOrigin ? 'production' : 'no configured origin'}).`);
-  console.log(`PASS: unknown URLs return 404; explicit referral works; responsive hero is ${optimizedBytes} bytes versus ${originalBytes} source bytes.`);
+  console.log(`PASS: unknown URLs return 404; doctor profile is ${referralDestination ? 'configured' : 'inactive without a redirect'}; responsive hero is ${optimizedBytes} bytes versus ${originalBytes} source bytes.`);
   console.log(`PASS: ${articlePaths.length} full guides, matching article/breadcrumb markup, discoverable article links, and valid internal anchors.`);
-  console.log(`PASS: hero has high loading priority; ad video and poster total ${adVideoBytes + posterBytes} bytes versus ${fallbackBytes} GIF bytes; click destination and loop attributes are retained.`);
+  console.log(`PASS: hero has high loading priority; ad video and poster total ${adVideoBytes + posterBytes} bytes versus ${fallbackBytes} GIF bytes; banner destination is ${adDestination ? 'configured' : 'inactive'} and loop attributes are retained.`);
 } finally {
   server.kill('SIGTERM');
   await new Promise(resolve => {
