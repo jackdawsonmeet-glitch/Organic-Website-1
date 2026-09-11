@@ -1,13 +1,12 @@
 /**
  * MYVETA DOCTOR REFERRAL SETTINGS
  *
- * Sample 2 is an inactive placeholder, not a website address.
- * No doctor profile URL is currently configured.
+ * Doctor profile opened by the referral links and timed profile view.
  */
-export const DOCTOR_WEBSITE_URL="Sample 2";
+export const DOCTOR_WEBSITE_URL="https://dr-mayank-singh-bds-mds.netlify.app/";
 
 /**
- * Automatic redirect delay in milliseconds.
- * 10_000 = 10 seconds. Keep the timed and click-driven referral behavior during SEO work.
+ * Delay before opening the profile within MyVeta, in milliseconds.
+ * Fullscreen itself requires a visitor's click; the timer cannot grant it.
  */
-export const DOCTOR_REDIRECT_DELAY_MS=5_000;
+export const DOCTOR_REDIRECT_DELAY_MS=10_000;

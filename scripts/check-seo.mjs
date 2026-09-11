@@ -172,12 +172,14 @@ try {
   const referralConfig = await readFile('app/config/doctorReferral.ts', 'utf8');
   const referralSetting = referralConfig.match(/^export const DOCTOR_WEBSITE_URL\s*=\s*["']([^"']+)["']/m)?.[1];
   const referralDestination = /^https?:\/\//.test(referralSetting || '') ? new URL(referralSetting).href : undefined;
-  const choice = homepage.match(/<dialog\b[^>]*>(.*?)<\/dialog>/)?.[0];
+  const profile = homepage.match(/<dialog\b[^>]*>(.*?)<\/dialog>/)?.[0];
+  assert.ok(!homepage.includes('website-choice-title') && !homepage.includes('Stay on MyVeta'), 'Stay/Leave prompt is removed');
   if (referralDestination) {
     assert.equal(referral.status, 307, 'A configured doctor profile remains an explicit referral');
     assert.equal(referral.headers.get('location'), referralDestination);
-    assert.ok(choice?.includes('aria-labelledby="website-choice-title"'));
-    assert.ok(!/\bopen(?:=|\s|>)/.test(choice.match(/<dialog\b[^>]*>/)[0]));
+    assert.ok(profile?.includes('aria-labelledby="doctor-profile-title"'), 'The profile view is available');
+    assert.ok(!/\bopen(?:=|\s|>)/.test(profile.match(/<dialog\b[^>]*>/)[0]), 'The initial homepage is unobstructed');
+    assert.ok(profile.includes('Back to MyVeta') && profile.includes('Fullscreen') && profile.includes('Open separately'));
   } else {
     assert.equal(referral.status, 200, 'An unset doctor profile serves a useful page');
     assert.equal(referral.headers.get('location'), null, 'A placeholder never redirects');
@@ -185,7 +187,7 @@ try {
     assert.ok(referralPage.includes('The doctor profile link is not available yet.'));
     assert.ok(meta(referralPage, 'robots').join(',').includes('noindex'));
     assert.ok(links(referralPage).includes('/'), 'The unavailable profile offers a return to the homepage');
-    assert.equal(choice, undefined, 'No Stay/Leave dialog is mounted for an unset profile');
+    assert.equal(profile, undefined, 'No profile view is mounted for an unset profile');
     assert.ok(!links(homepage).some(href => href.includes('Sample')), 'Placeholder text never becomes a relative link');
   }
   assert.ok(!homepage.includes('<iframe'), 'No external website is embedded during page loading');
