@@ -2,20 +2,23 @@
 
 This is the final public MyVeta website without login, ready for VS Code, GitHub, and Netlify.
 
-## Destination placeholders
+## Doctor profile and fullscreen browsing
 
-The previous doctor and advertisement addresses have been removed. Both settings now contain the inactive text `Sample 2`:
+The doctor and advertisement settings both point to the supplied dental profile at <https://dr-mayank-singh-bds-mds.netlify.app/>. They remain separate settings in `app/config/doctorReferral.ts` and `app/config/advertisement.ts`.
 
-- `DOCTOR_WEBSITE_URL` in `app/config/doctorReferral.ts`.
-- `AD_LINK_URL` in `app/config/advertisement.ts`.
+- The homepage opens normally, without a Stay / Leave prompt or an embedded destination download.
+- An ordinary click anywhere in the MyVeta document requests fullscreen. Normal menu controls, forms, and internal navigation keep working. Already-active fullscreen is reused; after a browser exit or denial, a later click can request it again.
+- `DOCTOR_REDIRECT_DELAY_MS=10_000` opens the profile ten seconds after the root component mounts. Clicking a doctor link, referral area, or advertisement opens its destination immediately and cancels the pending timer.
+- The profile loads in an iframe within the existing MyVeta document, so opening it does not require a top-level navigation that ends the current fullscreen session. The iframe is created only when the profile opens.
+- The profile toolbar offers **Back to MyVeta**, **Fullscreen**, and **Open separately**. Going back closes the view, cancels any pending opening, and leaves the current fullscreen state alone. Opening separately uses a normal new tab and is also available if the destination later stops allowing embedding.
 
-A placeholder is not treated as a website or a relative link. While the doctor profile is unset, the Stay / Leave component renders nothing: it starts no timer, registers no page-click handler, and makes no fullscreen request. The transparent homepage referral areas are omitted, and the hero text remains readable without an outgoing link. Existing **Find a Doctor** navigation opens a local, non-indexed page explaining that the profile link is not available yet, with a link back to MyVeta.
+Fullscreen is controlled by the browser. A timer cannot grant the required user activation: without a prior click, the profile opens within the browser window and the visitor can use **Fullscreen**. Escape and browser exit controls remain available; no Escape handler, exit-blocking logic, or automatic fullscreen re-entry loop is installed. Native dialog dismissal can also close the profile view. Clicking inside the cross-origin profile does not dispatch clicks to MyVeta; the surrounding toolbar remains available. A browser may deny fullscreen, end it on tab changes or navigation, or not support it.
 
-The stored delay remains `5_000` milliseconds; it is inactive while the profile is unset. No changes have been made to the existing choice controller or fullscreen behavior for configured destinations. The URL reader accepts absolute HTTP(S) addresses without embedded usernames or passwords; placeholder text, incomplete addresses, and other protocols remain inactive.
+The new profile returned HTTP 200 with no frame-blocking response headers when checked during this change. This is a response-header check, not browser testing or independent verification of the clinician's credentials. If the doctor setting is a placeholder or invalid address, the timer and profile component remain inactive and **Find a Doctor** serves the existing unavailable-profile page.
 
 ## Advertisement animation
 
-The banner stays visible while its destination is unset, using a non-clickable figure with the existing dimensions and styling. It plays `public/ads/casino-jackpot-storyboard.mp4` as a muted, inline loop. A first-frame poster appears while it loads. If playback fails or autoplay is blocked, it uses the original GIF.
+The configured advertisement link opens the same profile view. The banner keeps its existing dimensions and styling. It plays `public/ads/casino-jackpot-storyboard.mp4` as a muted, inline loop, with a first-frame poster and the original GIF fallback if playback fails. An unset advertisement destination leaves the animation visible without an outgoing link.
 
 `AD_MEDIA_URL`, `AD_POSTER_URL`, and `AD_FALLBACK_MEDIA_URL` in the same configuration file select these assets. To replace the creative, update all three together so the video, poster, and fallback show the same advertisement. `AD_MEDIA_URL` can also point to an image/GIF to render it directly.
 
@@ -81,7 +84,7 @@ The new guides are AI-assisted and have not been independently medically reviewe
 
 ### Verify the SEO output locally
 
-Run `node scripts/check-website-choice.mjs` for the choice controller checks (first click, timer, Stay, Leave, dismissal, session persistence, separate ad destinations, blocked fullscreen/storage, and cleanup). These simulate browser APIs; they do not replace browser testing.
+Run `node scripts/check-doctor-profile.mjs` for the fullscreen and profile controller checks (ordinary clicks, the ten-second timer, doctor/ad links, fullscreen ordering and denial, separate-tab links, cancellation, and cleanup). These simulate browser APIs; they do not replace browser testing.
 
 Build using a reserved test origin, then run the production HTTP checks:
 

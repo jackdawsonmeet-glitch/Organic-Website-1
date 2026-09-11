@@ -1,4 +1,4 @@
-import TimedDoctorRedirect from "./components/TimedDoctorRedirect";
+import DoctorProfileRedirect from "./components/DoctorProfileRedirect";
 import type { Metadata } from "next";
 import { isDeployPreview, siteName, siteUrl } from "./lib/seo";
 import "./globals.css";
@@ -15,5 +15,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body><TimedDoctorRedirect/>{children}</body></html>;
+  return <html lang="en"><body><DoctorProfileRedirect/>{children}</body></html>;
 }
