@@ -1,13 +1,10 @@
 /**
  * MYVETA DOCTOR REFERRAL SETTINGS
  *
- * To send visitors to a different website in the future, change ONLY the URL
- * between the quotation marks below. Keep the full `https://` address.
- *
- * Example:
- * export const DOCTOR_WEBSITE_URL="https://your-new-website.com/";
+ * Sample 2 is an inactive placeholder, not a website address.
+ * No doctor profile URL is currently configured.
  */
-export const DOCTOR_WEBSITE_URL="https://celebrated-baklava-653d75.netlify.app/";
+export const DOCTOR_WEBSITE_URL="Sample 2";
 
 /**
  * Automatic redirect delay in milliseconds.
