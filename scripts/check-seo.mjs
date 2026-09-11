@@ -174,7 +174,11 @@ try {
   const referralDestination = referralConfig.match(/^export const DOCTOR_WEBSITE_URL\s*=\s*["']([^"']+)["']/m)?.[1];
   assert.ok(referralDestination, 'Doctor destination is configured');
   assert.equal(referral.headers.get('location'), referralDestination);
-  assert.ok(homepage.includes('aria-label="Website 2"'), 'Timed redirect component remains mounted');
+  const choice = homepage.match(/<dialog\b[^>]*>(.*?)<\/dialog>/)?.[0];
+  assert.ok(choice?.includes('aria-labelledby="website-choice-title"'), 'Named Stay/Leave dialog is mounted');
+  assert.ok(!/\bopen(?:=|\s|>)/.test(choice.match(/<dialog\b[^>]*>/)[0]), 'Choice is closed in the initial HTML');
+  assert.ok(choice.includes('Stay on MyVeta') && choice.includes('Leave website'));
+  assert.ok(!homepage.includes('<iframe'), 'No external website is embedded during page loading');
   const referralAreas = [...homepage.matchAll(/<a\b[^>]*>/g)].map(m => m[0])
     .filter(tag => /(?:home-referral-hotspot|referral-hotspot|referral-copy-zone)/.test(attribute(tag, 'class')));
   assert.equal(referralAreas.length, 6, 'Keep all six original referral areas');

@@ -2,7 +2,17 @@
 
 This is the final public MyVeta website without login, ready for VS Code, GitHub, and Netlify.
 
-## Change the doctor website later
+## Stay / Leave choice and destination
+
+The first ordinary click opens a small MyVeta **Stay on MyVeta / Leave website** dialog. The existing fullscreen request runs from that click; if fullscreen is unavailable, the dialog still works. The configured timer can also open the choice, without navigating or loading the destination.
+
+- **Stay** closes the dialog on the current page without reloading it. Escape/native dismissal also means Stay. The automatic prompt is suppressed for the rest of that tab's session, including reloads and internal navigation.
+- **Leave** opens the displayed destination in the same tab. There is no external iframe or destination preloading.
+- Later intentional doctor or advertisement clicks show the choice for that link's destination. Ordinary browsing after Stay works normally, without requesting fullscreen again. Modified clicks keep the browser's usual behavior.
+
+This is a site dialog. It does not replace the browser's own close-tab or unsaved-changes prompt.
+
+To change the default **Leave** destination, open:
 
 Open:
 
@@ -18,11 +28,11 @@ That single setting controls:
 
 - all six original transparent homepage referral areas;
 - every **Find a Doctor** link;
-- the automatic redirect after **10 seconds**.
+- the first-click and timed Stay / Leave prompts.
 
-The original click handler, fullscreen behavior, and embedded destination are retained. Keep these features unchanged during SEO work, as requested by the site owner. The destination remains controlled by this setting; advertisements use their separate setting below.
+The destination remains controlled by this setting; advertisement clicks use their separate setting below. The dialog shows the full destination before the visitor chooses Leave.
 
-`DOCTOR_REDIRECT_DELAY_MS=10_000` sets the requested 10-second delay.
+`DOCTOR_REDIRECT_DELAY_MS` retains the owner's current value in that file: `1_000` milliseconds (one second). This controls when the choice appears if the visitor has not clicked or answered it. The timer never overrides Stay. For reference, `10_000` would mean ten seconds; this change does not alter the configured delay.
 
 ## Change the advertisement link later
 
@@ -36,7 +46,7 @@ Change only the **AD LINK** line:
 export const AD_LINK_URL="https://your-new-ad-link.com/";
 ```
 
-The banner plays `public/ads/casino-jackpot-storyboard.mp4` as a muted, inline loop. A first-frame poster appears while it loads. If playback fails or autoplay is blocked, it uses the original GIF. The surrounding advertisement link and fullscreen/referral handler are unchanged.
+The banner plays `public/ads/casino-jackpot-storyboard.mp4` as a muted, inline loop. A first-frame poster appears while it loads. If playback fails or autoplay is blocked, it uses the original GIF. The surrounding advertisement link supplies the destination for its Stay / Leave choice.
 
 `AD_MEDIA_URL`, `AD_POSTER_URL`, and `AD_FALLBACK_MEDIA_URL` in the same configuration file select these assets. To replace the creative, update all three together so the video, poster, and fallback show the same advertisement. `AD_MEDIA_URL` can also point to an image/GIF to render it directly.
 
@@ -101,6 +111,8 @@ Breadcrumbs are visible and marked up on guide, condition, health-section, wellb
 The new guides are AI-assisted and have not been independently medically reviewed; that status is visible on the guides and About page. Generic condition content, actual medical review, unfinished newsletter signup, and live search measurement remain work; see [SEO roadmap](docs/seo-roadmap.md).
 
 ### Verify the SEO output locally
+
+Run `node scripts/check-website-choice.mjs` for the choice controller checks (first click, timer, Stay, Leave, dismissal, session persistence, separate ad destinations, blocked fullscreen/storage, and cleanup). These simulate browser APIs; they do not replace browser testing.
 
 Build using a reserved test origin, then run the production HTTP checks:
 
