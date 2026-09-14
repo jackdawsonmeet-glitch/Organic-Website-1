@@ -23,6 +23,16 @@ export default function AnimatedAdvertisement({ src, fallbackSrc, poster }: Prop
     return () => { active = false; };
   }, [src, isVideo, useFallback]);
 
+  if (/\.svg(?:[?#]|$)/i.test(src)) {
+    // CSS inside the vector animates without downloading a video. Honor the
+    // visitor's motion preference with a matching still image.
+    return <picture>
+      <source media="(prefers-reduced-motion: reduce)" srcSet={fallbackSrc} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={description} width={970} height={90} decoding="async" />
+    </picture>;
+  }
+
   if (!isVideo || useFallback) {
     // The surrounding advertisement link owns navigation and click handling.
     // eslint-disable-next-line @next/next/no-img-element
