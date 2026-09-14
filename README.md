@@ -2,24 +2,23 @@
 
 This is the final public MyVeta website without login, ready for VS Code, GitHub, and Netlify.
 
-## Destination placeholders
+## Homepage word-game advertisement
 
-The previous doctor and advertisement addresses have been removed. Both settings now contain the inactive text `Sample 2`:
+The 970 × 90 homepage banner promotes **Daily Letter** at <https://crosswordgameplay.netlify.app/>. Although the domain says crossword, its current repository describes a five-letter word game, so the creative matches that game name and gameplay.
 
-- `DOCTOR_WEBSITE_URL` in `app/config/doctorReferral.ts`.
-- `AD_LINK_URL` in `app/config/advertisement.ts`.
+- Copy: “Your daily word break” / “Five letters. Six tries. A fresh puzzle each day.” / “Play Daily Letter”.
+- The visible advertisement label remains above the banner. Its accessible name identifies the game and new-tab destination.
+- Clicking anywhere on the banner opens the crossword website in a new tab. Its link sits above the adjacent referral zones so they cannot cover the artwork.
+- The static `public/ads/daily-letter-970x90.png` is 17,854 bytes, versus 199,014 bytes for the previous video and poster (about 91% less media). No animation or gambling imagery is displayed. This is an asset comparison, not a PageSpeed score.
+- `public/ads/daily-letter-970x90.svg` is the editable artwork. `AD_LINK_URL` and media paths are in `app/config/advertisement.ts`; all media settings point to the same new creative, so no old casino fallback loads.
 
-A placeholder is not treated as a website or a relative link. While the doctor profile is unset, the Stay / Leave component renders nothing: it starts no timer, registers no page-click handler, and makes no fullscreen request. The transparent homepage referral areas are omitted, and the hero text remains readable without an outgoing link. Existing **Find a Doctor** navigation opens a local, non-indexed page explaining that the profile link is not available yet, with a link back to MyVeta.
+This change is limited to the advertisement. On the current `main` baseline, `DOCTOR_WEBSITE_URL` is still the inactive `Sample 2` placeholder and the stored delay is unchanged at `5_000`. The separate fullscreen/profile PR is not included here.
 
-The stored delay remains `5_000` milliseconds; it is inactive while the profile is unset. No changes have been made to the existing choice controller or fullscreen behavior for configured destinations. The URL reader accepts absolute HTTP(S) addresses without embedded usernames or passwords; placeholder text, incomplete addresses, and other protocols remain inactive.
+### Advertising review limits
 
-## Advertisement animation
+The creative contains no prize, earnings, medical-benefit, guaranteed-result, or Google-approval claims. It follows the clarity and destination-matching principles in Google's [misrepresentation policy](https://support.google.com/adspolicy/answer/6020955?hl=en) and [destination requirements](https://support.google.com/adspolicy/answer/6368661?hl=en). Approval also depends on the full destination and advertiser account; this banner is not a compliance certification.
 
-The banner stays visible while its destination is unset, using a non-clickable figure with the existing dimensions and styling. It plays `public/ads/casino-jackpot-storyboard.mp4` as a muted, inline loop. A first-frame poster appears while it loads. If playback fails or autoplay is blocked, it uses the original GIF.
-
-`AD_MEDIA_URL`, `AD_POSTER_URL`, and `AD_FALLBACK_MEDIA_URL` in the same configuration file select these assets. To replace the creative, update all three together so the video, poster, and fallback show the same advertisement. `AD_MEDIA_URL` can also point to an image/GIF to render it directly.
-
-The optimized video is 163,280 bytes; including its 35,734-byte poster, the normal download is about 87% smaller than the original 1,521,631-byte GIF. Its 45 frame timestamps and three-second loop duration are preserved. Video compression is lossy. These are asset measurements, not a new live PageSpeed score.
+The crossword repository currently enables a 600-second automatic external view, requests fullscreen on ordinary clicks, and has an ad that describes a shopping offer while linking to a crossword page. These destination behaviors need separate review and correction before seeking Google Ads approval. The live destination returned HTTP 200 and Daily Letter content during a direct HTTP check. It sends `X-Frame-Options: DENY`, so the ad opens it in its own tab instead of embedding it. This is not interactive browser validation.
 
 ## Test in VS Code
 

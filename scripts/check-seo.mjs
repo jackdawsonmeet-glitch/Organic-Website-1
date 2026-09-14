@@ -219,25 +219,25 @@ try {
     assert.equal(adLink, undefined, 'The placeholder advertisement has no outgoing link');
     assert.ok(adFigure, 'The animation remains visible with an unset destination');
   }
-  const video = (adLink || adFigure).match(/<video\b[^>]*>/)?.[0];
-  assert.ok(video, 'Advertisement uses the smaller video');
-  assert.equal(attribute(video, 'src'), adSetting('AD_MEDIA_URL'));
-  assert.equal(attribute(video, 'poster'), adSetting('AD_POSTER_URL'));
-  for (const name of ['autoplay', 'muted', 'loop', 'playsinline']) {
-    assert.ok(new RegExp(`\\b${name}(?:=|\\s|>)`, 'i').test(video), `Advertisement keeps ${name}`);
+  const adImage = (adLink || adFigure).match(/<img\b[^>]*>/)?.[0];
+  assert.ok(adImage, 'Advertisement uses the static word-game banner');
+  assert.equal(attribute(adImage, 'src'), adSetting('AD_MEDIA_URL'));
+  assert.equal(attribute(adImage, 'width'), '970');
+  assert.equal(attribute(adImage, 'height'), '90');
+  assert.ok(attribute(adImage, 'alt').includes('Play Daily Letter'));
+  assert.ok(!(adLink || adFigure).includes('<video'), 'No video is loaded by the static banner');
+  if (adLink) {
+    assert.equal(attribute(adLink, 'target'), '_blank', 'Open the game in its own tab');
+    assert.ok(attribute(adLink, 'rel').split(' ').includes('sponsored'));
+    assert.ok(attribute(adLink, 'rel').split(' ').includes('noopener'));
+    assert.ok(attribute(adLink, 'aria-label').includes('Play Daily Letter'));
   }
-  assert.ok(!/\bcontrols(?:=|\s|>)/i.test(video), 'Media controls do not intercept ad clicks');
-  const adVideo = await get(adSetting('AD_MEDIA_URL'));
-  assert.equal(adVideo.status, 200);
-  assert.ok(adVideo.headers.get('content-type')?.includes('video/mp4'));
-  const adVideoBytes = (await adVideo.arrayBuffer()).byteLength;
-  const poster = await get(adSetting('AD_POSTER_URL'));
-  assert.equal(poster.status, 200);
-  const posterBytes = (await poster.arrayBuffer()).byteLength;
-  const fallback = await get(adSetting('AD_FALLBACK_MEDIA_URL'));
-  assert.equal(fallback.status, 200, 'Original animation fallback is available');
-  const fallbackBytes = (await fallback.arrayBuffer()).byteLength;
-  assert.ok(adVideoBytes + posterBytes < fallbackBytes * 0.2, 'Video and poster save over 80% of the original ad download');
+  const banner = await get(adSetting('AD_MEDIA_URL'));
+  assert.equal(banner.status, 200);
+  assert.ok(banner.headers.get('content-type')?.includes('image/png'));
+  const bannerBytes = (await banner.arrayBuffer()).byteLength;
+  assert.ok(bannerBytes < 30000, 'The static banner stays below 30 KB');
+  assert.ok(!homepage.includes('casino-jackpot'), 'No old casino media is referenced in the page');
   const optimized = await fetch(origin + '/_next/image?url=%2Fimages%2Fsenior-wellness.png&w=640&q=75', { headers: { Accept: 'image/webp' } });
   assert.equal(optimized.status, 200);
   assert.ok(optimized.headers.get('content-type')?.includes('image/webp'));
@@ -247,7 +247,7 @@ try {
   console.log(`PASS: ${paths.length} content pages, ${urls.length} sitemap URLs, canonical and indexing checks (${preview ? 'preview' : expectedOrigin ? 'production' : 'no configured origin'}).`);
   console.log(`PASS: unknown URLs return 404; doctor profile is ${referralDestination ? 'configured' : 'inactive without a redirect'}; responsive hero is ${optimizedBytes} bytes versus ${originalBytes} source bytes.`);
   console.log(`PASS: ${articlePaths.length} full guides, matching article/breadcrumb markup, discoverable article links, and valid internal anchors.`);
-  console.log(`PASS: hero has high loading priority; ad video and poster total ${adVideoBytes + posterBytes} bytes versus ${fallbackBytes} GIF bytes; banner destination is ${adDestination ? 'configured' : 'inactive'} and loop attributes are retained.`);
+  console.log(`PASS: hero has high loading priority; the 970 × 90 word-game banner is ${bannerBytes} bytes with a labeled game link and no video download.`);
 } finally {
   server.kill('SIGTERM');
   await new Promise(resolve => {
