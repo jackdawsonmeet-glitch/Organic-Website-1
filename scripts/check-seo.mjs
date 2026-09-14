@@ -220,12 +220,12 @@ try {
     assert.ok(adFigure, 'The animation remains visible with an unset destination');
   }
   const adImage = (adLink || adFigure).match(/<img\b[^>]*>/)?.[0];
-  assert.ok(adImage, 'Advertisement uses the static word-game banner');
+  assert.ok(adImage, 'Advertisement uses the animated word-game banner');
   assert.equal(attribute(adImage, 'src'), adSetting('AD_MEDIA_URL'));
   assert.equal(attribute(adImage, 'width'), '970');
   assert.equal(attribute(adImage, 'height'), '90');
   assert.ok(attribute(adImage, 'alt').includes('Play Daily Letter'));
-  assert.ok(!(adLink || adFigure).includes('<video'), 'No video is loaded by the static banner');
+  assert.ok(!(adLink || adFigure).includes('<video'), 'No video is loaded by the vector banner');
   if (adLink) {
     assert.equal(attribute(adLink, 'target'), '_blank', 'Open the game in its own tab');
     assert.ok(attribute(adLink, 'rel').split(' ').includes('sponsored'));
@@ -234,9 +234,23 @@ try {
   }
   const banner = await get(adSetting('AD_MEDIA_URL'));
   assert.equal(banner.status, 200);
-  assert.ok(banner.headers.get('content-type')?.includes('image/png'));
+  assert.ok(banner.headers.get('content-type')?.includes('image/svg+xml'));
   const bannerBytes = (await banner.arrayBuffer()).byteLength;
-  assert.ok(bannerBytes < 30000, 'The static banner stays below 30 KB');
+  assert.ok(bannerBytes < 30000, 'The animated banner stays below 30 KB');
+  const vector = await (await get(adSetting('AD_MEDIA_URL'))).text();
+  assert.ok(vector.includes('viewBox="0 0 970 90"'));
+  const animations = [...vector.matchAll(/animation:\s*[\w-]+\s+(\d+)s\s+[\w-]+\s+(\d+)/g)];
+  assert.equal(animations.length, 5, 'All five animated element groups have a finite timeline');
+  assert.ok(animations.every(([, seconds, cycles]) => Number(seconds) * Number(cycles) <= 24));
+  assert.ok(!vector.includes('infinite') && !vector.includes('<script'), 'No endless animation or script');
+  assert.ok(vector.includes('prefers-reduced-motion: reduce'));
+  const stillSource = (adLink || adFigure).match(/<source\b[^>]*>/)?.[0];
+  assert.ok(stillSource, 'Reduced motion selects the still image');
+  assert.equal(attribute(stillSource, 'media'), '(prefers-reduced-motion: reduce)');
+  assert.equal(attribute(stillSource, 'srcSet'), adSetting('AD_FALLBACK_MEDIA_URL'));
+  const still = await get(adSetting('AD_FALLBACK_MEDIA_URL'));
+  assert.equal(still.status, 200);
+  assert.ok(still.headers.get('content-type')?.includes('image/png'));
   assert.ok(!homepage.includes('casino-jackpot'), 'No old casino media is referenced in the page');
   const optimized = await fetch(origin + '/_next/image?url=%2Fimages%2Fsenior-wellness.png&w=640&q=75', { headers: { Accept: 'image/webp' } });
   assert.equal(optimized.status, 200);

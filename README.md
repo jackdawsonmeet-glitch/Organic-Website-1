@@ -9,14 +9,15 @@ The 970 × 90 homepage banner promotes **Daily Letter** at <https://crosswordgam
 - Copy: “Your daily word break” / “Five letters. Six tries. A fresh puzzle each day.” / “Play Daily Letter”.
 - The visible advertisement label remains above the banner. Its accessible name identifies the game and new-tab destination.
 - Clicking anywhere on the banner opens the crossword website in a new tab. Its link sits above the adjacent referral zones so they cannot cover the artwork.
-- The static `public/ads/daily-letter-970x90.png` is 17,854 bytes, versus 199,014 bytes for the previous video and poster (about 91% less media). No animation or gambling imagery is displayed. This is an asset comparison, not a PageSpeed score.
-- `public/ads/daily-letter-970x90.svg` is the editable artwork. `AD_LINK_URL` and media paths are in `app/config/advertisement.ts`; all media settings point to the same new creative, so no old casino fallback loads.
+- `public/ads/daily-letter-970x90.svg` animates letter tiles, alternates two sliding headlines, grows a small accent line, and sweeps a soft highlight across the gold play link. Three eight-second cycles end at 24 seconds on the original readable headline. It contains no script, video, flashing, or gambling imagery.
+- Visitors with reduced motion enabled receive the matching still PNG through a picture source; the SVG also disables its own animations under that preference. The PNG is 22,716 bytes. Asset size is not a PageSpeed score.
+- `public/ads/daily-letter-970x90.svg` is the editable artwork. `AD_LINK_URL` and media paths are in `app/config/advertisement.ts`; the main media path uses the animated SVG, while the fallback and poster paths use its still PNG. No old casino fallback loads.
 
 This change is limited to the advertisement. On the current `main` baseline, `DOCTOR_WEBSITE_URL` is still the inactive `Sample 2` placeholder and the stored delay is unchanged at `5_000`. The separate fullscreen/profile PR is not included here.
 
 ### Advertising review limits
 
-The creative contains no prize, earnings, medical-benefit, guaranteed-result, or Google-approval claims. It follows the clarity and destination-matching principles in Google's [misrepresentation policy](https://support.google.com/adspolicy/answer/6020955?hl=en) and [destination requirements](https://support.google.com/adspolicy/answer/6368661?hl=en). Approval also depends on the full destination and advertiser account; this banner is not a compliance certification.
+The creative contains no prize, earnings, medical-benefit, guaranteed-result, or Google-approval claims. It follows the clarity and destination-matching principles in Google's [misrepresentation policy](https://support.google.com/adspolicy/answer/6020955?hl=en) and [destination requirements](https://support.google.com/adspolicy/answer/6368661?hl=en). Motion stops before the 30-second maximum in the [image-ad animation policy](https://support.google.com/adspolicy/answer/176108?hl=en). This SVG is a website asset, not a packaged Google Ads upload. Approval also depends on the full destination and advertiser account; this banner is not a compliance certification.
 
 The crossword repository currently enables a 600-second automatic external view, requests fullscreen on ordinary clicks, and has an ad that describes a shopping offer while linking to a crossword page. These destination behaviors need separate review and correction before seeking Google Ads approval. The live destination returned HTTP 200 and Daily Letter content during a direct HTTP check. It sends `X-Frame-Options: DENY`, so the ad opens it in its own tab instead of embedding it. This is not interactive browser validation.
 

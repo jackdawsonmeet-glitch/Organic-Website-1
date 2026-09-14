@@ -1,8 +1,8 @@
 /** Website promoted by the homepage banner. */
 export const AD_LINK_URL="https://crosswordgameplay.netlify.app/";
 
-/** Static 970 × 90 Daily Letter banner; no video or GIF download. */
-export const AD_MEDIA_URL="/ads/daily-letter-970x90.png";
-/** Keep optional media settings on the same creative. */
+/** Animated 970 × 90 vector; three eight-second cycles, then a still frame. */
+export const AD_MEDIA_URL="/ads/daily-letter-970x90.svg";
+/** Matching still image for visitors who prefer reduced motion. */
 export const AD_FALLBACK_MEDIA_URL="/ads/daily-letter-970x90.png";
 export const AD_POSTER_URL="/ads/daily-letter-970x90.png";

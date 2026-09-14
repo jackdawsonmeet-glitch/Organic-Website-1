@@ -1,23 +1,55 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="970" height="90" viewBox="0 0 970 90" role="img" aria-labelledby="title desc">
   <title id="title">Daily Letter — Your daily word break</title>
   <desc id="desc">Five letters. Six tries. A fresh puzzle each day. Play Daily Letter at crosswordgameplay.netlify.app.</desc>
-  <rect width="970" height="90" fill="#f7f4ed"/>
+  <defs>
+    <linearGradient id="paper" x2="1" y2="1"><stop stop-color="#fff9e9"/><stop offset="1" stop-color="#e7f5ee"/></linearGradient>
+    <linearGradient id="gold"><stop stop-color="#ffe398"/><stop offset="1" stop-color="#f5bd4f"/></linearGradient>
+    <linearGradient id="shine"><stop stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".4"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <clipPath id="headline-window"><rect x="269" y="8" width="456" height="39"/></clipPath>
+    <clipPath id="button-window"><rect x="746" y="15" width="200" height="43" rx="6"/></clipPath>
+  </defs>
+  <style>
+    /* Three eight-second cycles; all motion ends at 24 seconds. */
+    .tile { animation: tile-wave 8s ease-in-out 3; }
+    .tile:nth-child(2) { animation-name: tile-wave-2; }
+    .tile:nth-child(3) { animation-name: tile-wave-3; }
+    .tile:nth-child(4) { animation-name: tile-wave-4; }
+    .tile:nth-child(5) { animation-name: tile-wave-5; }
+    .headline { animation: headline-slide 8s ease-in-out 3; }
+    .alternate { transform: translateY(42px); animation: alternate-slide 8s ease-in-out 3; }
+    .shine { transform: translateX(-100px); animation: button-shine 8s ease-in-out 3; }
+    .accent { transform-origin: 274px 81px; animation: accent-grow 8s ease-in-out 3; }
+    @keyframes tile-wave { 0%,16%,100% {transform:translateY(0)} 8% {transform:translateY(-6px)} }
+    @keyframes tile-wave-2 { 0%,3%,19%,100% {transform:translateY(0)} 11% {transform:translateY(-6px)} }
+    @keyframes tile-wave-3 { 0%,6%,22%,100% {transform:translateY(0)} 14% {transform:translateY(-6px)} }
+    @keyframes tile-wave-4 { 0%,9%,25%,100% {transform:translateY(0)} 17% {transform:translateY(-6px)} }
+    @keyframes tile-wave-5 { 0%,12%,28%,100% {transform:translateY(0)} 20% {transform:translateY(-6px)} }
+    @keyframes headline-slide { 0%,35%,88%,100% {transform:translateY(0)} 44%,79% {transform:translateY(-42px)} }
+    @keyframes alternate-slide { 0%,35%,88%,100% {transform:translateY(42px)} 44%,79% {transform:translateY(0)} }
+    @keyframes button-shine { 0%,48% {transform:translateX(-100px)} 72%,100% {transform:translateX(220px)} }
+    @keyframes accent-grow { 0%,100% {transform:scaleX(1)} 40%,70% {transform:scaleX(1.8)} }
+    @media (prefers-reduced-motion: reduce) { .tile,.headline,.alternate,.shine,.accent {animation:none} }
+  </style>
+  <rect width="970" height="90" fill="url(#paper)"/>
   <path d="M0 0h232l18 90H0z" fill="#17324d"/>
   <g font-family="Arial, Helvetica, sans-serif">
     <text x="26" y="32" fill="#fff" font-size="26" font-weight="700">Daily Letter</text>
     <g fill="#fff" font-size="17" font-weight="700" text-anchor="middle">
-      <rect x="27" y="46" width="27" height="28" rx="3" fill="#33765d"/>
-      <rect x="60" y="46" width="27" height="28" rx="3" fill="#33765d"/>
-      <rect x="93" y="46" width="27" height="28" rx="3" fill="#986e20"/>
-      <rect x="126" y="46" width="27" height="28" rx="3" fill="#526579"/>
-      <rect x="159" y="46" width="27" height="28" rx="3" fill="#33765d"/>
-      <text x="40.5" y="66">W</text><text x="73.5" y="66">O</text>
-      <text x="106.5" y="66">R</text><text x="139.5" y="66">D</text><text x="172.5" y="66">S</text>
+      <g class="tile"><rect x="27" y="46" width="27" height="28" rx="3" fill="#33765d"/><text x="40.5" y="66">W</text></g>
+      <g class="tile"><rect x="60" y="46" width="27" height="28" rx="3" fill="#33765d"/><text x="73.5" y="66">O</text></g>
+      <g class="tile"><rect x="93" y="46" width="27" height="28" rx="3" fill="#986e20"/><text x="106.5" y="66">R</text></g>
+      <g class="tile"><rect x="126" y="46" width="27" height="28" rx="3" fill="#526579"/><text x="139.5" y="66">D</text></g>
+      <g class="tile"><rect x="159" y="46" width="27" height="28" rx="3" fill="#33765d"/><text x="172.5" y="66">S</text></g>
     </g>
-    <text x="273" y="39" fill="#17324d" font-size="31" font-weight="700">Your daily word break</text>
+    <g clip-path="url(#headline-window)" fill="#17324d" font-size="31" font-weight="700">
+      <text class="headline" x="273" y="39">Your daily word break</text>
+      <text class="alternate" transform="translate(0 42)" x="273" y="39">Five letters. Six tries.</text>
+    </g>
     <text x="274" y="66" fill="#435467" font-size="17">Five letters. Six tries. A fresh puzzle each day.</text>
-    <rect x="746" y="15" width="200" height="43" rx="6" fill="#17324d"/>
-    <text x="846" y="43" fill="#fff" font-size="20" font-weight="700" text-anchor="middle">Play Daily Letter</text>
+    <rect class="accent" x="274" y="80" width="80" height="3" rx="1.5" fill="#33765d"/>
+    <rect x="746" y="15" width="200" height="43" rx="6" fill="url(#gold)"/>
+    <g clip-path="url(#button-window)"><path class="shine" transform="translate(-100 0)" d="M746 15h65l-20 43h-65z" fill="url(#shine)"/></g>
+    <text x="846" y="43" fill="#17324d" font-size="20" font-weight="700" text-anchor="middle">Play Daily Letter</text>
     <text x="846" y="77" fill="#435467" font-size="12" text-anchor="middle">crosswordgameplay.netlify.app</text>
   </g>
   <rect x=".5" y=".5" width="969" height="89" fill="none" stroke="#c2cbd3"/>

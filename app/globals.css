@@ -47,7 +47,7 @@
 
 
 
-/* Static 970 × 90 advertisement. Its click destination is the AD LINK in app/config/advertisement.ts. */
+/* Animated 970 × 90 advertisement. Its click destination is the AD LINK in app/config/advertisement.ts. */
 .advertisement-link{position:relative;z-index:9;display:block;width:100%;max-width:970px;aspect-ratio:970/90;margin:auto;border:0;overflow:hidden;background:#f7f4ed}
 .advertisement-link img,.advertisement-link video{display:block;width:100%;height:100%;object-fit:fill}
 
@@ -70,7 +70,7 @@
 @media(max-width:900px){.referral-hotspot-2,.referral-hotspot-5{width:14vw}}
 @media(max-width:600px){.referral-hotspot-2,.referral-hotspot-5{width:54px}}
 
-/* Static 970 × 90 advertisement. Its click destination is the AD LINK in app/config/advertisement.ts. */
+/* Animated 970 × 90 advertisement. Its click destination is the AD LINK in app/config/advertisement.ts. */
 .advertisement-link{position:relative;z-index:9;display:block;width:100%;max-width:970px;aspect-ratio:970/90;margin:auto;border:0;overflow:hidden;background:#f7f4ed}
 .advertisement-link img,.advertisement-link video{display:block;width:100%;height:100%;object-fit:fill}
 
