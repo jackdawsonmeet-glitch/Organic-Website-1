@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 type Props = { src: string; fallbackSrc: string; poster: string };
-const description = "Animated casino jackpot advertisement";
+const description = "Daily Letter — Your daily word break. Five letters. Six tries. A fresh puzzle each day. Play Daily Letter. crosswordgameplay.netlify.app";
 
 export default function AnimatedAdvertisement({ src, fallbackSrc, poster }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);

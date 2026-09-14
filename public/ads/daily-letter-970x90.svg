@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="970" height="90" viewBox="0 0 970 90" role="img" aria-labelledby="title desc">
+  <title id="title">Daily Letter — Your daily word break</title>
+  <desc id="desc">Five letters. Six tries. A fresh puzzle each day. Play Daily Letter at crosswordgameplay.netlify.app.</desc>
+  <rect width="970" height="90" fill="#f7f4ed"/>
+  <path d="M0 0h232l18 90H0z" fill="#17324d"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="26" y="32" fill="#fff" font-size="26" font-weight="700">Daily Letter</text>
+    <g fill="#fff" font-size="17" font-weight="700" text-anchor="middle">
+      <rect x="27" y="46" width="27" height="28" rx="3" fill="#33765d"/>
+      <rect x="60" y="46" width="27" height="28" rx="3" fill="#33765d"/>
+      <rect x="93" y="46" width="27" height="28" rx="3" fill="#986e20"/>
+      <rect x="126" y="46" width="27" height="28" rx="3" fill="#526579"/>
+      <rect x="159" y="46" width="27" height="28" rx="3" fill="#33765d"/>
+      <text x="40.5" y="66">W</text><text x="73.5" y="66">O</text>
+      <text x="106.5" y="66">R</text><text x="139.5" y="66">D</text><text x="172.5" y="66">S</text>
+    </g>
+    <text x="273" y="39" fill="#17324d" font-size="31" font-weight="700">Your daily word break</text>
+    <text x="274" y="66" fill="#435467" font-size="17">Five letters. Six tries. A fresh puzzle each day.</text>
+    <rect x="746" y="15" width="200" height="43" rx="6" fill="#17324d"/>
+    <text x="846" y="43" fill="#fff" font-size="20" font-weight="700" text-anchor="middle">Play Daily Letter</text>
+    <text x="846" y="77" fill="#435467" font-size="12" text-anchor="middle">crosswordgameplay.netlify.app</text>
+  </g>
+  <rect x=".5" y=".5" width="969" height="89" fill="none" stroke="#c2cbd3"/>
+</svg>
